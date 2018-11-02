@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="kr.co.spring.board.dao.BoardMapper">
+	<select id="getBoardList" resultType="BoardVO">
+		SELECT 
+			A.BOARD_NO, A.BOARD_TITLE
+			, TO_CHAR(A.REGDATE, 'YYYY.MM.DD') AS REGDATE
+			, A.CNT, COUNT(B.COMMENT_NO) AS COMMENT_CNT
+		FROM S_BOARD A
+		LEFT JOIN S_COMMENT B
+		ON A.BOARD_NO = B.BOARD_NO
+		GROUP BY A.BOARD_NO, A.BOARD_TITLE, A.REGDATE, A.CNT
+		ORDER BY BOARD_NO DESC
+	</select>
+	
+	<select id="getBoardDetail" parameterType="int" resultType="BoardVO">
+		SELECT 
+			BOARD_TITLE, BOARD_CONTENT
+			, TO_CHAR(REGDATE, 'YYYY.MM.DD') AS REGDATE
+			, CNT
+		FROM S_BOARD
+		WHERE board_no = #{int}
+	</select>
+	
+	<update id="boardUpdateCnt" parameterType="int">
+		UPDATE S_BOARD
+		SET cnt = cnt + 1
+		WHERE board_no = #{board_no}
+	</update>
+	
+	<delete id="deleteBoard" parameterType="int">
+		DELETE FROM S_BOARD WHERE board_no = #{int} 
+	</delete>
+	
+	<select id="getCommentList" parameterType="int" resultType="CommentVO">
+		SELECT 
+			COMMENT_NO, COMMENT_CONTENT
+			, TO_CHAR(REGDATE, 'YYYY.MM.DD') AS REGDATE
+		FROM S_COMMENT
+		WHERE BOARD_NO = #{int}
+		ORDER BY COMMENT_NO DESC
+	</select>
+</mapper>
